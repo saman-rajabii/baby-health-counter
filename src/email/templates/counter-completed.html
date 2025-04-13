@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kick Counter Completed</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #4A90E2;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    .footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: #999;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #4A90E2;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4A90E2;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Baby Health App</h1>
+    </div>
+    <div class="content">
+      <h2>Kick Counter Session Completed</h2>
+      <p>Hello {{ userName }},</p>
+      <p>Your kick counting session has been completed successfully.</p>
+      
+      <h3>Session Details:</h3>
+      <p>
+        <strong>Started:</strong> {{ startTime }}<br>
+        <strong>Finished:</strong> {{ endTime }}<br>
+        <strong>Duration:</strong> {{ duration }} hours<br>
+        <strong>Total Kicks:</strong> {{ totalKicks }} kicks<br>
+        <strong>Kick Rate:</strong> {{ kickRate }} kicks per hour
+      </p>
+      
+      <p>
+        It's recommended to do kick counting sessions 2-3 times daily, especially during the third trimester. If you notice a significant decrease in movements, please contact your healthcare provider.
+      </p>
+      
+      <a href="{{ appUrl }}" class="button">View Details in App</a>
+    </div>
+    <div class="footer">
+      <p>This is an automated message from Baby Health App. Please do not reply to this email.</p>
+      <p>© {{ year }} Baby Health App. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html> 
