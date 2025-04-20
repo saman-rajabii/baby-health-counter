@@ -39,9 +39,9 @@ export class User {
   @OneToMany(() => PregnancyStatus, (pregnancyStatus) => pregnancyStatus.user)
   pregnancyStatuses: PregnancyStatus[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

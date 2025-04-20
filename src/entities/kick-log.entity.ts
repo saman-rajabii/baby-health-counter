@@ -14,8 +14,8 @@ export class KickLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'timestamp' })
-  happenedAt: Date;
+  @Column({ type: 'timestamptz', nullable: true })
+  happenedAt?: Date;
 
   @Column()
   counterId: string;
@@ -24,9 +24,9 @@ export class KickLog {
   @JoinColumn({ name: 'counterId' })
   counter: KickCounter;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

@@ -38,9 +38,9 @@ export class ContractionCounter {
   @OneToMany(() => ContractionLog, (log) => log.counter)
   contractionLogs: ContractionLog[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

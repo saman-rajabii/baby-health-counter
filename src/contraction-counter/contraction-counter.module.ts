@@ -6,6 +6,7 @@ import { ContractionCounterController } from './contraction-counter.controller';
 import { ContractionLog } from '../entities/contraction-log.entity';
 import { CounterSetting } from '../entities/counter-setting.entity';
 import { User } from '../entities/user.entity';
+import { PregnancyStatus } from '../entities/pregnancy-status.entity';
 import { EmailModule } from '../email/email.module';
 
 @Module({
@@ -15,6 +16,7 @@ import { EmailModule } from '../email/email.module';
       ContractionLog,
       CounterSetting,
       User,
+      PregnancyStatus,
     ]),
     EmailModule,
   ],

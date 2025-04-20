@@ -9,6 +9,7 @@ import {
 } from 'src/entities/counter-setting.entity';
 import { KickLog } from 'src/entities/kick-log.entity';
 import { User } from 'src/entities/user.entity';
+import { PregnancyStatus } from 'src/entities/pregnancy-status.entity';
 import { NotificationService } from 'src/email/services/notification.service';
 
 @Injectable()
@@ -22,6 +23,8 @@ export class KickCounterService {
     private kickLogRepository: Repository<KickLog>,
     @InjectRepository(CounterSetting)
     private counterSettingRepository: Repository<CounterSetting>,
+    @InjectRepository(PregnancyStatus)
+    private pregnancyStatusRepository: Repository<PregnancyStatus>,
     private notificationService: NotificationService,
   ) {}
 
@@ -106,11 +109,19 @@ export class KickCounterService {
         where: { counterType: CounterType.KICK },
       });
 
+      // Get the latest pregnancy status for this user
+      const pregnancyStatus = await this.pregnancyStatusRepository.findOne({
+        where: { userId: user.id },
+        order: { createdAt: 'DESC' },
+      });
+
       // Check if conditions are met to send notification
       if (
         kickSettings &&
         kickLogCount < kickSettings.minCount &&
-        kickCounter.period >= kickSettings.minPeriod
+        kickCounter.period * 60 >= kickSettings.minPeriod &&
+        pregnancyStatus &&
+        pregnancyStatus.week >= 25
       ) {
         // Send notification email
 

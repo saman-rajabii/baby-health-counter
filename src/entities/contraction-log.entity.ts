@@ -14,10 +14,10 @@ export class ContractionLog {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamptz' })
   startedAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamptz' })
   endedAt: Date;
 
   @Column({ type: 'int', comment: 'Duration in seconds' })
@@ -29,9 +29,9 @@ export class ContractionLog {
   @JoinColumn({ name: 'counterId' })
   counter: ContractionCounter;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

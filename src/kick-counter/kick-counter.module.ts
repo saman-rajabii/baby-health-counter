@@ -8,10 +8,18 @@ import { KickLogService } from './kick-log.service';
 import { KickLogController } from './kick-log.controller';
 import { User } from 'src/entities/user.entity';
 import { CounterSetting } from 'src/entities/counter-setting.entity';
+import { PregnancyStatus } from 'src/entities/pregnancy-status.entity';
 import { EmailModule } from 'src/email/email.module';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([KickCounter, KickLog, User, CounterSetting]),
+    TypeOrmModule.forFeature([
+      KickCounter,
+      KickLog,
+      User,
+      CounterSetting,
+      PregnancyStatus,
+    ]),
     EmailModule,
   ],
   controllers: [KickCounterController, KickLogController],

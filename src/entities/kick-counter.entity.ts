@@ -16,10 +16,10 @@ export class KickCounter {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamptz' })
   startedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   finishedAt: Date | null;
 
   @Column({ type: 'int', default: 2 })
@@ -35,9 +35,9 @@ export class KickCounter {
   @OneToMany(() => KickLog, (kickLog) => kickLog.counter)
   kickLogs: KickLog[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

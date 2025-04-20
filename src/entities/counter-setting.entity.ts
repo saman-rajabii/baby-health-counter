@@ -29,9 +29,9 @@ export class CounterSetting {
   @Column({ type: 'int', comment: 'Period in minutes' })
   minPeriod: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

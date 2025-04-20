@@ -24,9 +24,9 @@ export class PregnancyStatus {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

@@ -10,6 +10,7 @@ import { NotificationService } from '../email/services/notification.service';
 import { User } from '../entities/user.entity';
 import { CounterSetting } from '../entities/counter-setting.entity';
 import { CounterType } from '../entities/counter-setting.entity';
+import { PregnancyStatus } from '../entities/pregnancy-status.entity';
 
 @Injectable()
 export class ContractionCounterService {
@@ -22,6 +23,8 @@ export class ContractionCounterService {
     private counterSettingRepository: Repository<CounterSetting>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(PregnancyStatus)
+    private pregnancyStatusRepository: Repository<PregnancyStatus>,
     private notificationService: NotificationService,
   ) {}
 
@@ -117,6 +120,12 @@ export class ContractionCounterService {
         });
       }
 
+      // Get the latest pregnancy status for this user
+      const pregnancyStatus = await this.pregnancyStatusRepository.findOne({
+        where: { userId: counter.user.id },
+        order: { createdAt: 'DESC' },
+      });
+
       const minimumCount = contractionSetting.minCount;
       const logsCount = counter.contractionLogs?.length || 0;
 
@@ -124,17 +133,27 @@ export class ContractionCounterService {
         `User has ${logsCount} contractions in counter ${counter.id} (minimum recommended: ${minimumCount})`,
       );
 
-      // Check if the counter has been active for at least the minimum period
-      const minimumPeriod = contractionSetting.minPeriod || 1; // Default to 1 hour if not set
-      const hoursSinceCreation =
-        (new Date().getTime() - new Date(counter.createdAt).getTime()) /
-        (1000 * 60 * 60);
+      const nowInMs = new Date().getTime();
+      const createdAtInMs = new Date(counter.createdAt).getTime();
 
       this.logger.log(
-        `Counter has been active for ${hoursSinceCreation.toFixed(2)} hours (minimum period: ${minimumPeriod} hours)`,
+        `now: ${nowInMs} , timeSinceCreationInMinutes: ${createdAtInMs}`,
+      );
+      // Check if the counter has been active for at least the minimum period
+      const minimumPeriod = contractionSetting.minPeriod || 1; // Default to 1 hour if not set
+      const timeSinceCreationInMinutes =
+        (nowInMs - createdAtInMs) / (1000 * 60);
+
+      this.logger.log(
+        `Counter has been active for ${timeSinceCreationInMinutes.toFixed(2)} minutes (minimum period: ${minimumPeriod} minutes)`,
       );
       // Check if below minimum threshold
-      if (logsCount < minimumCount && hoursSinceCreation >= minimumPeriod) {
+      if (
+        logsCount < minimumCount &&
+        timeSinceCreationInMinutes >= minimumPeriod &&
+        pregnancyStatus &&
+        pregnancyStatus.week >= 25
+      ) {
         await this.sendAlertEmail(counter.user, logsCount, minimumCount);
       }
     } catch (error) {
