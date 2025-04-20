@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -6,12 +6,23 @@ import {
   ContractionCounterStatus,
 } from '../entities/contraction-counter.entity';
 import { CreateContractionCounterDto } from './dto/create-contraction-counter.dto';
+import { NotificationService } from '../email/services/notification.service';
+import { User } from '../entities/user.entity';
+import { CounterSetting } from '../entities/counter-setting.entity';
+import { CounterType } from '../entities/counter-setting.entity';
 
 @Injectable()
 export class ContractionCounterService {
+  private readonly logger = new Logger(ContractionCounterService.name);
+
   constructor(
     @InjectRepository(ContractionCounter)
     private contractionCounterRepository: Repository<ContractionCounter>,
+    @InjectRepository(CounterSetting)
+    private counterSettingRepository: Repository<CounterSetting>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private notificationService: NotificationService,
   ) {}
 
   /**
@@ -72,7 +83,94 @@ export class ContractionCounterService {
 
     counter.status = ContractionCounterStatus.CLOSED;
 
+    // Check contraction activity before closing
+    await this.checkContractionActivity(counter);
+
     return this.contractionCounterRepository.save(counter);
+  }
+
+  /**
+   * Check contraction activity and send alerts if needed
+   * @param counter - The contraction counter to check
+   */
+  private async checkContractionActivity(
+    counter: ContractionCounter,
+  ): Promise<void> {
+    this.logger.log(`Checking contraction activity for counter ${counter.id}`);
+
+    try {
+      // Get the contraction settings for minimum count
+      const contractionSetting = await this.counterSettingRepository.findOne({
+        where: { counterType: CounterType.CONTRACTION },
+      });
+
+      if (!contractionSetting) {
+        this.logger.warn('No contraction settings found, skipping check');
+        return;
+      }
+
+      // Reload counter with user details if not already loaded
+      if (!counter.user) {
+        counter = await this.contractionCounterRepository.findOne({
+          where: { id: counter.id },
+          relations: ['user', 'contractionLogs'],
+        });
+      }
+
+      const minimumCount = contractionSetting.minCount;
+      const logsCount = counter.contractionLogs?.length || 0;
+
+      this.logger.log(
+        `User has ${logsCount} contractions in counter ${counter.id} (minimum recommended: ${minimumCount})`,
+      );
+
+      // Check if the counter has been active for at least the minimum period
+      const minimumPeriod = contractionSetting.minPeriod || 1; // Default to 1 hour if not set
+      const hoursSinceCreation =
+        (new Date().getTime() - new Date(counter.createdAt).getTime()) /
+        (1000 * 60 * 60);
+
+      this.logger.log(
+        `Counter has been active for ${hoursSinceCreation.toFixed(2)} hours (minimum period: ${minimumPeriod} hours)`,
+      );
+      // Check if below minimum threshold
+      if (logsCount < minimumCount && hoursSinceCreation >= minimumPeriod) {
+        await this.sendAlertEmail(counter.user, logsCount, minimumCount);
+      }
+    } catch (error) {
+      this.logger.error(
+        `Error checking contraction activity: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  /**
+   * Send alert email to user with insufficient contractions
+   */
+  private async sendAlertEmail(
+    user: User,
+    actualCount: number,
+    minimumCount: number,
+  ): Promise<boolean> {
+    this.logger.log(`Sending alert email to user ${user.id}`);
+
+    await this.notificationService.sendAlertNotification({
+      to: user.email,
+      userName: user.name,
+      type: 'contraction-alert',
+      actualCount: actualCount,
+      minimumCount: minimumCount,
+      alertColor: '#e74c3c', // Red for warning
+      alertTitle: 'Low Contraction Activity Alert',
+      alertMessage: `You've had only ${actualCount} contractions in the monitoring period (minimum recommended: ${minimumCount}).`,
+      alertTime: new Date().toLocaleString(),
+      alertDescription:
+        'Regular contraction monitoring is important for tracking your labor progress. Please check your health status and consult your healthcare provider if necessary.',
+      appUrl: `${process.env.APP_URL}/contraction-counter`,
+    });
+
+    return true;
   }
 
   /**

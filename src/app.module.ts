@@ -10,7 +10,6 @@ import { ContractionCounterModule } from './contraction-counter/contraction-coun
 import { EmailModule } from './email/email.module';
 import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ContractionCheckModule } from './contraction-check/contraction-check.module';
 import { ContractionLogModule } from './contraction-log/contraction-log.module';
 
 @Module({
@@ -45,7 +44,6 @@ import { ContractionLogModule } from './contraction-log/contraction-log.module';
     KickCounterModule,
     ContractionCounterModule,
     EmailModule,
-    ContractionCheckModule,
     ContractionLogModule,
   ],
   controllers: [AppController],
