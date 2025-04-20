@@ -8,7 +8,7 @@ async function bootstrap() {
 
   // Enable CORS for frontend
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://127.0.0.1:3001'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
     allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
@@ -35,6 +35,7 @@ async function bootstrap() {
     .addTag('kick-counters', 'Kick counter tracking endpoints')
     .addTag('kick-logs', 'Kick logs tracking endpoints')
     .addTag('contraction-counters', 'Contraction tracking endpoints')
+    .addTag('contraction-logs', 'Contraction logs tracking endpoints')
     .addBearerAuth(
       {
         type: 'http',
@@ -47,8 +48,9 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('doc', app, document);
 
-  await app.listen(process.env.PORT || 3000);
+  console.log('Starting server on port', process.env.PORT || 7000);
+  await app.listen(process.env.PORT || 7000);
 }
 bootstrap();

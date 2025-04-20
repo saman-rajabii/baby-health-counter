@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import * as path from 'path';
+import { MailerService } from '@nestjs-modules/mailer';
 
 export interface EmailOptions {
   to: string | string[];
@@ -20,36 +19,14 @@ export interface EmailOptions {
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
   private readonly logger = new Logger(EmailService.name);
 
-  constructor(private configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      service: this.configService.get<string>('EMAIL_SERVICE'),
-      auth: {
-        user: this.configService.get<string>('EMAIL_USER'),
-        pass: this.configService.get<string>('EMAIL_PASSWORD'),
-      },
-    });
-
-    this.verifyConnection();
-  }
-
-  private async verifyConnection() {
-    try {
-      await this.transporter.verify();
-      this.logger.log('Email service connection established');
-    } catch (error) {
-      this.logger.error(
-        `Failed to establish email service connection: ${error.message}`,
-      );
-    }
-  }
+  constructor(private readonly mailerService: MailerService) {}
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
     try {
       const mailOptions = {
-        from: this.configService.get<string>('EMAIL_FROM'),
+        // from: this.configService.get<string>('EMAIL_FROM'),
         to: options.to,
         subject: options.subject,
         text: options.text,
@@ -57,7 +34,7 @@ export class EmailService {
         attachments: options.attachments,
       };
 
-      await this.transporter.sendMail(mailOptions);
+      await this.mailerService.sendMail(mailOptions);
       this.logger.log(`Email sent to ${options.to}`);
       return true;
     } catch (error) {

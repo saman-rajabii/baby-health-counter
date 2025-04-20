@@ -59,6 +59,7 @@ export class KickCounterService {
     return this.kickCounterRepository.find({
       where: { userId },
       order: { startedAt: 'DESC' },
+      relations: ['kickLogs'],
     });
   }
 
@@ -112,12 +113,14 @@ export class KickCounterService {
         kickCounter.period >= kickSettings.minPeriod
       ) {
         // Send notification email
+
         await this.notificationService.sendAlertNotification({
           type: 'counter-completed',
           to: user.email,
           userName: user.name,
           totalKicks: kickLogCount,
           duration: `${kickCounter.period} hours`,
+          startTime: kickCounter.startedAt.toISOString(),
           completedAt: kickCounter.finishedAt.toISOString(),
           appUrl: process.env.APP_URL || 'https://babyhealth.app',
         });

@@ -9,6 +9,8 @@ import {
   ParseUUIDPipe,
   UseGuards,
   Req,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import { ContractionCounterService } from './contraction-counter.service';
 import { ContractionCounter } from '../entities/contraction-counter.entity';
@@ -111,5 +113,54 @@ export class ContractionCounterController {
       );
     }
     return counter;
+  }
+
+  @Patch(':id/close')
+  @ApiOperation({ summary: 'Close a contraction counter session' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the contraction counter to close',
+    type: 'string',
+  })
+  @ApiOkResponse({
+    description: 'Contraction counter closed successfully',
+    type: ContractionCounterDto,
+  })
+  @ApiNotFoundResponse({ description: 'Contraction counter not found' })
+  async closeCounter(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ContractionCounter> {
+    try {
+      return await this.contractionCounterService.closeCounter(id);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to close contraction counter',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a contraction counter' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the contraction counter to delete',
+    type: 'string',
+  })
+  @ApiOkResponse({
+    description: 'Contraction counter deleted successfully',
+  })
+  @ApiNotFoundResponse({ description: 'Contraction counter not found' })
+  async deleteCounter(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    try {
+      await this.contractionCounterService.deleteCounter(id);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to delete contraction counter',
+        error instanceof HttpException
+          ? error.getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

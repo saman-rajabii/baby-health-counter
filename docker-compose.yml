@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # NestJS Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: baby-health-api
+    restart: unless-stopped
+    ports:
+      - '7000:7000'
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres # Must match the service name below
+      - DB_PORT=5432
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    # Run migrations and start the application
+    command: >
+      sh -c "
+        echo 'Waiting for database to start...' &&
+        sleep 5 &&
+        npm run migration:run &&
+        node dist/main"
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: baby-health-postgres
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

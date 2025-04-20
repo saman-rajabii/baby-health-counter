@@ -1,31 +1,14 @@
-import { IsDate } from 'class-validator';
-import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional } from 'class-validator';
+import { ContractionCounterStatus } from '../../entities/contraction-counter.entity';
 
 export class CreateContractionCounterDto {
-  @ApiProperty({
-    description: 'No properties needed as user ID comes from JWT token',
-    type: 'object',
-    properties: {},
-    additionalProperties: false,
-    default: {},
+  @ApiPropertyOptional({
+    enum: ContractionCounterStatus,
+    default: ContractionCounterStatus.ACTIVE,
+    description: 'Status of the contraction counter',
   })
-  // No properties needed, userId will come from the authenticated user
-  @ApiProperty({
-    description: 'Optional timestamp when the counting session was startedAt',
-    example: '2025-04-12T21:30:00.000Z',
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  startedAt: Date;
-
-  @ApiProperty({
-    description: 'Optional timestamp when the counting session was finished',
-    example: '2025-04-12T21:30:00.000Z',
-    required: false,
-  })
-  @IsDate()
-  @Type(() => Date)
-  finishedAt: Date;
+  @IsOptional()
+  @IsEnum(ContractionCounterStatus)
+  status?: ContractionCounterStatus;
 }

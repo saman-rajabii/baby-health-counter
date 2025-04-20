@@ -15,19 +15,20 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         transport: {
-          host: configService.get('MAIL_HOST'),
-          port: configService.get('MAIL_PORT'),
-          secure: configService.get('MAIL_SECURE', false),
+          host: configService.get('EMAIL_HOST'),
+          port: configService.get('EMAIL_PORT'),
+          service: configService.get('EMAIL_SERVICE'),
+          secure: configService.get('EMAIL_SECURE', false),
           auth: {
-            user: configService.get('MAIL_USER'),
-            pass: configService.get('MAIL_PASSWORD'),
+            user: configService.get('EMAIL_USER'),
+            pass: configService.get('EMAIL_PASSWORD'),
           },
         },
         defaults: {
-          from: `"${configService.get('MAIL_FROM_NAME', 'Baby Health App')}" <${configService.get('MAIL_FROM_EMAIL', 'noreply@babyhealth.app')}>`,
+          from: `"No Reply" <${configService.get('EMAIL_USER')}>`,
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          dir: join(process.cwd(), 'public', 'email', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

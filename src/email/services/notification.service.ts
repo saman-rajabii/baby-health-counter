@@ -48,6 +48,7 @@ export class NotificationService {
         userName: notification.userName,
         totalKicks: notification.totalKicks,
         duration: notification.duration,
+        startedAt: notification.startTime,
         completedAt: notification.completedAt,
         appUrl: notification.appUrl,
       },

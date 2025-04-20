@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Baby Health Alert</title>
+  <title>Kick Counter Completed</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
       padding: 20px;
     }
     .header {
-      background-color: {{ alertColor }};
+      background-color: #4A90E2;
       color: white;
       padding: 20px;
       text-align: center;
@@ -33,16 +33,14 @@
       font-size: 12px;
       color: #999;
     }
-    .alert-box {
-      border-left: 4px solid {{ alertColor }};
-      padding: 15px;
-      margin: 20px 0;
-      background-color: #fff;
+    .highlight {
+      font-weight: bold;
+      color: #4A90E2;
     }
     .button {
       display: inline-block;
       padding: 10px 20px;
-      background-color: {{ alertColor }};
+      background-color: #4A90E2;
       color: white;
       text-decoration: none;
       border-radius: 5px;
@@ -53,24 +51,30 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>{{ alertType }} Alert</h1>
+      <h1>Baby Health App</h1>
     </div>
     <div class="content">
-      <h2>{{ alertTitle }}</h2>
+      <h2>Kick Counter Session Completed</h2>
       <p>Hello {{ userName }},</p>
+      <p>Your kick counting session has been completed successfully.</p>
       
-      <div class="alert-box">
-        <p><strong>{{ alertMessage }}</strong></p>
-        <p>Time: {{ alertTime }}</p>
-      </div>
+      <h3>Session Details:</h3>
+      <p>
+        <strong>Started:</strong> {{ startedAt }}<br>
+        <strong>Finished:</strong> {{ completedAt }}<br>
+        <strong>Duration:</strong> {{ duration }} hours<br>
+        <strong>Total Kicks:</strong> {{ totalKicks }} kicks<br>
+      </p>
       
-      <p>{{ alertDescription }}</p>
+      <p>
+        It's recommended to do kick counting sessions 2-3 times daily, especially during the third trimester. If you notice a significant decrease in movements, please contact your healthcare provider.
+      </p>
       
       <a href="{{ appUrl }}" class="button">View Details in App</a>
     </div>
     <div class="footer">
       <p>This is an automated message from Baby Health App. Please do not reply to this email.</p>
-      <p>© {{ year }} Baby Health App. All rights reserved.</p>
+      <p>© 2025 Baby Health App. All rights reserved.</p>
     </div>
   </div>
 </body>

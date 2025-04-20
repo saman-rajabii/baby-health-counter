@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ContractionCounter } from '../entities/contraction-counter.entity';
-
+import {
+  ContractionCounter,
+  ContractionCounterStatus,
+} from '../entities/contraction-counter.entity';
 import { CreateContractionCounterDto } from './dto/create-contraction-counter.dto';
 
 @Injectable()
@@ -22,12 +24,10 @@ export class ContractionCounterService {
     userId: string,
     createContractionCounterDto?: CreateContractionCounterDto,
   ): Promise<ContractionCounter> {
-    const now = new Date();
-
     const contractionCounter = this.contractionCounterRepository.create({
       userId,
-      startedAt: now,
-      ...createContractionCounterDto,
+      status:
+        createContractionCounterDto?.status || ContractionCounterStatus.ACTIVE,
     });
 
     return this.contractionCounterRepository.save(contractionCounter);
@@ -41,7 +41,8 @@ export class ContractionCounterService {
   async findByUserId(userId: string): Promise<ContractionCounter[]> {
     return this.contractionCounterRepository.find({
       where: { userId },
-      order: { startedAt: 'DESC' },
+      order: { createdAt: 'DESC' },
+      relations: ['contractionLogs'],
     });
   }
 
@@ -51,6 +52,43 @@ export class ContractionCounterService {
    * @returns The contraction counter or null if not found
    */
   async findById(id: string): Promise<ContractionCounter | null> {
-    return this.contractionCounterRepository.findOneBy({ id });
+    return this.contractionCounterRepository.findOne({
+      where: { id },
+      relations: ['contractionLogs'],
+    });
+  }
+
+  /**
+   * Close a contraction counter
+   * @param id - The ID of the contraction counter to close
+   * @returns The updated contraction counter
+   */
+  async closeCounter(id: string): Promise<ContractionCounter> {
+    const counter = await this.findById(id);
+
+    if (!counter) {
+      throw new Error(`Contraction counter with ID ${id} not found`);
+    }
+
+    counter.status = ContractionCounterStatus.CLOSED;
+
+    return this.contractionCounterRepository.save(counter);
+  }
+
+  /**
+   * Delete a contraction counter
+   * @param id - The ID of the contraction counter to delete
+   * @returns The result of the delete operation
+   */
+  async deleteCounter(id: string): Promise<void> {
+    const counter = await this.findById(id);
+
+    if (!counter) {
+      throw new NotFoundException(
+        `Contraction counter with ID ${id} not found`,
+      );
+    }
+
+    await this.contractionCounterRepository.remove(counter);
   }
 }

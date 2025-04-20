@@ -1,89 +1,3 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-
 # Baby Health Counter App
 
 This application helps pregnant women track fetal movements ("kick counting") and contractions.
@@ -95,50 +9,114 @@ This application helps pregnant women track fetal movements ("kick counting") an
 - User authentication and profile management
 - Statistics for kick counts and contractions
 
-## Database Setup and Migrations
+## Database Structure
 
-The application uses PostgreSQL and TypeORM for database management. Follow these steps to set up the database:
+The application uses the following database structure:
 
-1. Make sure PostgreSQL is installed and running
-2. Create a database named `baby_health` (or update the .env file with your desired database name)
-3. Run the migrations to set up the database schema:
+```
+┌─────────────────────┐      ┌──────────────────────┐      ┌───────────────────┐
+│      users          │      │    kickCounters      │      │     kickLogs      │
+├─────────────────────┤      ├──────────────────────┤      ├───────────────────┤
+│ id (PK)             │      │ id (PK)              │      │ id (PK)           │
+│ name                │      │ startedAt            │      │ happenedAt        │
+│ email               │◄─────┤ finishedAt           │◄─────┤ counterId (FK)    │
+│ password            │      │ period               │      │ createdAt         │
+│ isActive            │      │ userId (FK)          │      │ updatedAt         │
+│ createdAt           │      │ createdAt            │      └───────────────────┘
+│ updatedAt           │      │ updatedAt            │
+└─────────────────────┘      └──────────────────────┘
+          ▲
+          │
+          │                   ┌──────────────────────┐      ┌───────────────────┐
+          │                   │ contractionCounters  │      │  contractionLogs  │
+          │                   ├──────────────────────┤      ├───────────────────┤
+          └───────────────────┤ id (PK)              │      │ id (PK)           │
+          │                   │ status               │◄─────┤ startedAt         │
+          │                   │ userId (FK)          │      │ endedAt           │
+          │                   │ createdAt            │      │ duration          │
+          │                   │ updatedAt            │      │ counterId (FK)    │
+          │                   └──────────────────────┘      │ createdAt         │
+          │                                                 │ updatedAt         │
+          │                                                 └───────────────────┘
+          │
+          │                   ┌──────────────────────┐
+          │                   │  pregnancyStatuses   │
+          │                   ├──────────────────────┤
+          └───────────────────┤ id (PK)              │
+                              │ week                 │
+                              │ userId (FK)          │
+                              │ createdAt            │
+                              │ updatedAt            │
+                              └──────────────────────┘
 
-```bash
-# Run migrations
-npm run migration:run
-# or
-node migrate.js run
-
-# Seed initial data
-npm run db:seed
+┌───────────────────┐
+│  counterSettings  │
+├───────────────────┤
+│ id (PK)           │
+│ counterType       │
+│ minCount          │
+│ minPeriod         │
+│ createdAt         │
+│ updatedAt         │
+└───────────────────┘
 ```
 
-To create a new migration:
+### Entity Relationships
 
-```bash
-# Generate a new migration
-node migrate.js generate MigrationName
-```
+1. **User**
 
-To revert the most recent migration:
+   - Has many KickCounters
+   - Has many ContractionCounters
+   - Has many PregnancyStatuses
 
-```bash
-# Revert migrations
-npm run migration:revert
-# or
-node migrate.js revert
-```
+2. **KickCounter**
 
-## Environment Variables
+   - Belongs to one User
+   - Has many KickLogs
 
-Create a `.env` file in the root directory with the following variables:
+3. **ContractionCounter**
+
+   - Belongs to one User
+   - Has many ContractionLogs
+
+4. **KickLog**
+
+   - Belongs to one KickCounter
+
+5. **ContractionLog**
+
+   - Belongs to one ContractionCounter
+
+6. **PregnancyStatus**
+
+   - Belongs to one User
+
+7. **CounterSetting**
+   - Standalone configuration entity for counter thresholds
+
+---
+
+## How To Run
+
+## Docker Setup
+
+This project is containerized using Docker and Docker Compose for easy deployment.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) (version 20.10.0 or higher)
+- [Docker Compose](https://docs.docker.com/compose/install/) (version 2.0.0 or higher)
+
+### Environment Configuration
+
+1. Create a `.env` file in the root directory with the following variables:
 
 ```
 NODE_ENV=development
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
-DB_PASSWORD=postgres
+DB_PASSWORD=your_password
 DB_DATABASE=baby_health
 
 # JWT Configuration
@@ -146,13 +124,58 @@ JWT_SECRET=your_super_secret_jwt_key_change_in_production
 JWT_EXPIRES_IN=7d
 
 # Email Configuration (for notifications)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
 EMAIL_SERVICE=gmail
 EMAIL_USER=your_gmail_address@gmail.com
 EMAIL_PASSWORD=your_gmail_app_password
 EMAIL_FROM="Baby Health App <your_gmail_address@gmail.com>"
 ```
 
-## Development
+> Note: The Docker Compose setup will override some of these values (DB_HOST will be set to 'postgres').
+
+### Building and Starting the Application
+
+1. **Build and start the containers**:
+
+```bash
+docker-compose up -d
+```
+
+This command will:
+
+- Build the NestJS application image
+- Start a PostgreSQL database container
+- Run database migrations automatically
+- Start the application on port 7000
+
+2. **View logs**:
+
+```bash
+docker-compose logs -f
+```
+
+3. **Stop the application**:
+
+```bash
+docker-compose down
+```
+
+4. **Stop and remove volumes** (This will delete all data!):
+
+```bash
+docker-compose down -v
+```
+
+### Accessing the Application
+
+- API: http://localhost:7000
+- API Documentation: http://localhost:7000/doc (Swagger UI)
+- Database: PostgreSQL on localhost:5432 (for external tools)
+
+## Development Without Docker
+
+If you prefer to develop without Docker:
 
 ```bash
 # Installation
@@ -166,6 +189,21 @@ npm run build
 npm run start:prod
 ```
 
-## API Documentation
+## Database Migrations
 
-The API documentation is available at `/api` when the application is running (powered by Swagger).
+To manage database migrations manually:
+
+```bash
+# Run migrations
+npm run migration:run
+
+# Generate a new migration
+npm run migration:generate MyMigrationName
+
+# Revert the most recent migration
+npm run migration:revert
+```
+
+## License
+
+This project is [MIT licensed](LICENSE).
